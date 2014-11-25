@@ -41,6 +41,9 @@ class doapache (
 
 ) {
 
+  # strip period from php version to get lib name
+  $php_version_safe = regsubst($php_version, '\.', '')
+
   case $server_provider {
     'zend': {
       class { 'doapache::zendserver':
@@ -54,8 +57,49 @@ class doapache (
       }
     }
     'apache': {
-      # @todo install Apache
-      # @todo install PHP
+      case $server_version {
+        '2.2.29': {
+          # install devopera yum repo, not enabled by default
+          yumrepo { 'devopera':
+            baseurl  => 'http://files.devopera.com/repo/CentOS/6/x86_64/',
+            enabled  => 1,
+            # disable gpgcheck for now, keep it simple
+            gpgcheck => 0,
+            # gpgkey   => "http://files.devopera.com/repo/CentOS/6/x86_64/RPM-GPG-KEY-CentOS-6",
+            descr    => "Extra Packages for Enterprise Linux 6 - \$basearch ",
+            before   => [Class['apache']],
+          }
+        }
+      }
+      class { 'apache': }
+      class { 'apache::mod::php':
+        package_name => "php${php_version_safe}-php",
+        path         => "${::apache::params::lib_path}/libphp${php_version_safe}-php5.so",
+      }
+      # create a common anchor for external packages
+      anchor { 'doapache-package' :
+        require => Package["${::apache::params::apache_name}"],
+      }
+      anchor { 'doapache-pre-start' :
+        before => Service["${::apache::params::service_name}"],
+      }
+          # package { 'httpd':
+          #   ensure => present,
+          # }
+          # # start apache server on startup
+          # service { 'doapache-apache-server-startup' :
+          #   name => 'httpd',
+          #   enable => true,
+          #   ensure => running,
+          #   require => Augeas['doapache-php-ini'],
+          # }
+          # # create a common anchor for external packages
+          # anchor { 'doapache-package' :
+          #   require => Package['httpd'],
+          # }
+          # anchor { 'doapache-pre-start' :
+          #   before => Service['doapache-apache-server-startup'],
+          # }
     }
   }
 
