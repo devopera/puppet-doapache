@@ -1,10 +1,14 @@
-[devopera](http://devopera.com)-[dozendserver](http://devopera.com/module/dozendserver)
+[devopera](http://devopera.com)-[doapache](http://devopera.com/module/doapache)
 ============
 
-Zend Server setup for devopera puppet config
+Apache setup for devopera puppet config.  This module incorporates and replaces the deprecated dozendserver module.
 
 Changelog
 ---------
+
+2014-11-27
+
+  * Major work on breaking up into components and linking them together, to allow more modular flexibility
 
 2014-06-04
 
