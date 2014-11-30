@@ -34,6 +34,13 @@ class doapache::zendserver (
     tag => ['doapache-zend-package'],
   }
 
+  # give apache a custom group
+  class {'doapache::zendserver::group':
+    user => $user,
+    group_name => $group_name,
+    notifier_dir => $notifier_dir,
+  }
+
   # create a common anchor for external packages
   anchor { 'doapache-package' :
     require => Package['doapache-zend-web-pack'],
@@ -102,18 +109,8 @@ class doapache::zendserver (
   case $operatingsystem {
     centos, redhat, fedora: {
       # setup the zend repo file
-      if ($server_version != undef) {
-        $repo_version_insert = "${server_version}/"
-      } else {
-        $repo_version_insert = ''
-      }
-      file { 'doapache-zend-repo-file':
-        name => '/etc/yum.repos.d/zend.repo',
-        content => template('doapache/zend.rpm.repo.erb'),
-      }
-      # make the package install dependent upon the reflash
-      Package <| tag == 'doapache-zend-package' |> {
-        require => File['doapache-zend-repo-file'],
+      class { 'doapache::zendserver::repo': 
+        server_version => $server_version,
       }
       # install SSH2
       package { 'doapache-zend-install-ssh2-module':
