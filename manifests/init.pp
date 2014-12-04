@@ -84,6 +84,15 @@ class doapache (
             descr    => "Extra Packages for Enterprise Linux 6 - \$basearch ",
             before   => [Class['apache']],
           }
+          # setup additional config file that's not included in apache package
+          file { 'doapache-mpm-sysconfig-httpd':
+            name => '/etc/sysconfig/httpd',
+            source => 'puppet:///modules/doapache/httpd-sysconfig-mpm.conf',
+            owner => 'root',
+            group => 'root',
+            mode => 0644,
+            before => [Class['apache']],
+          }
         }
       }
       # no need to append user because apache already in group add list
