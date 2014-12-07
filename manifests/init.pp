@@ -72,8 +72,21 @@ class doapache (
       }
     }
     'apache': {
+      # no need to append user because apache already in group add list
+      $webserver_user_group_append = ''
+      # use puppet module to install apache (uses yum, therefore devopera repo)
+      class { 'apache':
+        group => $group_name,
+      }
+      # create a common anchor for external packages
+      anchor { 'doapache-package' :
+        require => Package["${::apache::params::apache_name}"],
+      }
+      anchor { 'doapache-pre-start' :
+        before => Service["${::apache::params::service_name}"],
+      }
       case $server_version {
-        '2.2.29': {
+        '2.2.29-1': {
           # install devopera yum repo, not enabled by default
           yumrepo { 'devopera':
             baseurl  => 'http://files.devopera.com/repo/CentOS/6/x86_64/',
@@ -93,20 +106,20 @@ class doapache (
             mode => 0644,
             before => [Class['apache']],
           }
+          # install required apache packages
+          if ! defined(Package['httpd']) {
+            package { 'httpd' :
+              ensure => $server_version,
+              require => [Yumrepo['devopera']],
+            }
+          }
+          if ! defined(Package['mod_ssl']) {
+            package { 'mod_ssl' :
+              ensure => $server_version,
+              require => [Yumrepo['devopera']],
+            }
+          }
         }
-      }
-      # no need to append user because apache already in group add list
-      $webserver_user_group_append = ''
-      # use puppet module to install apache (uses yum, therefore devopera repo)
-      class { 'apache':
-        group => $group_name,
-      }
-      # create a common anchor for external packages
-      anchor { 'doapache-package' :
-        require => Package["${::apache::params::apache_name}"],
-      }
-      anchor { 'doapache-pre-start' :
-        before => Service["${::apache::params::service_name}"],
       }
           # package { 'httpd':
           #   ensure => present,
