@@ -78,6 +78,13 @@ class doapache (
       class { 'apache':
         group => $group_name,
       }
+      # fix /etc/httpd/run symlink to be consistent with /etc/init.d/httpd pidfile location
+      file { "${::apache::httpd_dir}/run":
+        ensure  => symlink,
+        target => "../..${::apache::logroot}",
+        notify  => Class['Apache::Service'],
+        require => Package['httpd'],
+      }
       # create a common anchor for external packages
       anchor { 'doapache-package' :
         require => Package["${::apache::params::apache_name}"],
