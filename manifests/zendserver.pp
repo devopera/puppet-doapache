@@ -233,10 +233,21 @@ class doapache::zendserver (
         cwd => '/tmp/',
       }
       # setup repo
-      file { 'doapache-zend-repo-file':
-        name => '/etc/apt/sources.list.d/zend.list',
-        # using special ubuntu.repo file, but eventually default back to deb.repo
-        source => 'puppet:///modules/doapache/zend.ubuntu.repo',
+      case $operatingsystemmajrelease {
+        '13.04', '14.04': {
+          file { 'doapache-zend-repo-file':
+            name => '/etc/apt/sources.list.d/zend.list',
+            # using special ubuntu.repo file, but eventually default back to deb.repo
+            source => 'puppet:///modules/doapache/zend.ubuntu-apache2.4.repo',
+          }
+        }
+        '12.04', default: {
+          file { 'doapache-zend-repo-file':
+            name => '/etc/apt/sources.list.d/zend.list',
+            # using special ubuntu.repo file, but eventually default back to deb.repo
+            source => 'puppet:///modules/doapache/zend.ubuntu.repo',
+          }
+        }
       }
       # re-flash the repos
       exec { 'zend-repo-reflash':
