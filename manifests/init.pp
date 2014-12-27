@@ -182,16 +182,9 @@ class doapache (
     }
   }
 
-  # setup hostname in conf.d
-  file { 'doapache-conf-hostname' :
-    name => "/etc/${apache::params::apache_name}/conf.d/hostname.conf",
-    content => "ServerName ${fqdn}\nNameVirtualHost *:${port}\n",
-    require => Anchor['doapache-package'],
-    before => Anchor['doapache-pre-start'],
-  }
-
   case $operatingsystem {
     centos, redhat, fedora: {
+      $confd_name = 'conf.d'
     }
     ubuntu, debian: {
       # setup symlink for logs directory
@@ -207,7 +200,24 @@ class doapache (
         command => 'a2dissite 000-default',
         require => Anchor['doapache-package'],
       }
+
+      case $operatingsystemmajrelease {
+        '13.04', '14.04': {
+          $confd_name = 'conf-enabled'
+        }
+        '12.04', default: {
+          $confd_name = 'conf.d'
+        }
+      }
     }
+  }
+
+  # setup hostname in conf.d
+  file { 'doapache-conf-hostname' :
+    name => "/etc/${apache::params::apache_name}/${confd_name}/hostname.conf",
+    content => "ServerName ${fqdn}\nNameVirtualHost *:${port}\n",
+    require => Anchor['doapache-package'],
+    before => Anchor['doapache-pre-start'],
   }
 
 }
