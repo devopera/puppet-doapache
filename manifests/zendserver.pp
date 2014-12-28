@@ -180,6 +180,7 @@ class doapache::zendserver (
           command => "semanage fcontext -a -t httpd_log_t '/usr/local/zend/var/log(/.*)?' && touch ${notifier_dir}/puppet-doapache-selinux-fix",
           creates => "${notifier_dir}/puppet-doapache-selinux-fix",
           before => Anchor['doapache-pre-start'],
+          require => File["${notifier_dir}"],
         }
 
         # 
