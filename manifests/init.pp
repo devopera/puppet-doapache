@@ -39,7 +39,7 @@ class doapache (
   # ----------------------
   # begin class
 
-) {
+) inherits doapache::params {
 
   case $server_provider {
     'zend': {
@@ -183,9 +183,6 @@ class doapache (
   }
 
   case $operatingsystem {
-    centos, redhat, fedora: {
-      $confd_name = 'conf.d'
-    }
     ubuntu, debian: {
       # setup symlink for logs directory
       file { 'doapache-ubuntu-symlink-logs' :
@@ -200,21 +197,18 @@ class doapache (
         command => 'a2dissite 000-default',
         require => Anchor['doapache-package'],
       }
-
-      case $operatingsystemmajrelease {
-        '13.04', '14.04': {
-          $confd_name = 'conf-enabled'
-        }
-        '12.04', default: {
-          $confd_name = 'conf.d'
-        }
+      # ensure that there's an apache user (otherwise tries to run with www-data:www-data)
+      docommon::ensureuser { 'doapache-apache-create-user' :
+        user => 'apache',
+        home => '/var/www',
+        before => [Anchor['doapache-pre-start']],
       }
     }
   }
 
   # setup hostname in conf.d
   file { 'doapache-conf-hostname' :
-    name => "/etc/${apache::params::apache_name}/${confd_name}/hostname.conf",
+    name => "/etc/${apache::params::apache_name}/${doapache::params::confd_name}/hostname.conf",
     content => "ServerName ${fqdn}\nNameVirtualHost *:${port}\n",
     require => Anchor['doapache-package'],
     before => Anchor['doapache-pre-start'],
