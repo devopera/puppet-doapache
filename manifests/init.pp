@@ -74,11 +74,6 @@ class doapache (
     'apache': {
       # no need to append user because apache already in group add list
       $webserver_user_group_append = ''
-      # use puppet module to install apache (uses yum, therefore devopera repo)
-      class { 'apache':
-        group => $group_name,
-        purge_configs => false,
-      }
       # fix /etc/httpd/run symlink to be consistent with /etc/init.d/httpd pidfile location
       file { "${::apache::httpd_dir}/run":
         ensure  => symlink,
@@ -129,23 +124,22 @@ class doapache (
           }
         }
       }
-          # package { 'httpd':
-          #   ensure => present,
-          # }
-          # # start apache server on startup
-          # service { 'doapache-apache-server-startup' :
-          #   name => 'httpd',
-          #   enable => true,
-          #   ensure => running,
-          #   require => Augeas['doapache-php-ini'],
-          # }
-          # # create a common anchor for external packages
-          # anchor { 'doapache-package' :
-          #   require => Package['httpd'],
-          # }
-          # anchor { 'doapache-pre-start' :
-          #   before => Service['doapache-apache-server-startup'],
-          # }
+      # use puppet module to install apache (uses yum, therefore devopera repo)
+      # no longer using apache module
+      #   class { 'apache':
+      #     group => $group_name,
+      #   }
+      # in favour of just doing it ourselves
+      package { "${::apache::params::apache_name}":
+        ensure => present,
+      }
+      # start apache server on startup
+      service { "${::apache::params::service_name}" :
+        enable => true,
+        ensure => running,
+        hasstatus => true,
+        hasrestart => true,
+      }
     }
   }
 
