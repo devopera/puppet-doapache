@@ -117,16 +117,16 @@ class doapache (
       if ! defined(Package["${::apache::params::apache_name}"]) {
         package { "${::apache::params::apache_name}" :
           ensure => $server_version ? {
-            undef:    'present',
-            default:  $server_version,
+            undef   => 'present',
+            default => $server_version,
           },
         }
       }
       if ! defined(Package['mod_ssl']) {
         package { 'mod_ssl' :
           ensure => $server_version ? {
-            undef:    'present',
-            default:  $server_version,
+            undef   => 'present',
+            default => $server_version,
           },
         }
       }
