@@ -41,6 +41,8 @@ class doapache (
 
 ) inherits doapache::params {
 
+  include "apache::params"
+
   case $server_provider {
     'zend': {
       class { 'doapache::zendserver':
@@ -75,11 +77,11 @@ class doapache (
       # no need to append user because apache already in group add list
       $webserver_user_group_append = ''
       # fix /etc/httpd/run symlink to be consistent with /etc/init.d/httpd pidfile location
-      file { "${::apache::httpd_dir}/run":
+      file { "${::apache::params::httpd_dir}/run":
         ensure  => symlink,
-        target => "../..${::apache::logroot}",
-        notify  => Class['Apache::Service'],
-        require => Package['httpd'],
+        target => "../..${::apache::params::logroot}",
+        notify  => Service["${::apache::params::service_name}"],
+        require => Package["${::apache::params::apache_name}"],
       }
       # create a common anchor for external packages
       anchor { 'doapache-package' :
@@ -98,7 +100,7 @@ class doapache (
             gpgcheck => 0,
             # gpgkey   => "http://files.devopera.com/repo/CentOS/6/x86_64/RPM-GPG-KEY-CentOS-6",
             descr    => "Extra Packages for Enterprise Linux 6 - \$basearch ",
-            before   => [Class['apache']],
+            before   => [Package["${::apache::params::apache_name}"], Package['mod_ssl']],
           }
           # setup additional config file that's not included in apache package
           file { 'doapache-mpm-sysconfig-httpd':
@@ -107,21 +109,25 @@ class doapache (
             owner => 'root',
             group => 'root',
             mode => 0644,
-            before => [Class['apache']],
+            before => [Package["${::apache::params::apache_name}"]],
           }
-          # install required apache packages
-          if ! defined(Package['httpd']) {
-            package { 'httpd' :
-              ensure => $server_version,
-              require => [Yumrepo['devopera']],
-            }
-          }
-          if ! defined(Package['mod_ssl']) {
-            package { 'mod_ssl' :
-              ensure => $server_version,
-              require => [Yumrepo['devopera']],
-            }
-          }
+        }
+      }
+      # install required apache packages (to version if specified)
+      if ! defined(Package["${::apache::params::apache_name}"]) {
+        package { "${::apache::params::apache_name}" :
+          ensure => $server_version ? {
+            undef:    'present',
+            default:  $server_version,
+          },
+        }
+      }
+      if ! defined(Package['mod_ssl']) {
+        package { 'mod_ssl' :
+          ensure => $server_version ? {
+            undef:    'present',
+            default:  $server_version,
+          },
         }
       }
       # use puppet module to install apache (uses yum, therefore devopera repo)
@@ -130,10 +136,6 @@ class doapache (
       #     group => $group_name,
       #   }
       # in favour of just doing it ourselves
-      package { "${::apache::params::apache_name}":
-        ensure => present,
-      }
-      # start apache server on startup
       service { "${::apache::params::service_name}" :
         enable => true,
         ensure => running,
