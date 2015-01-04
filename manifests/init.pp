@@ -77,6 +77,7 @@ class doapache (
       # use puppet module to install apache (uses yum, therefore devopera repo)
       class { 'apache':
         group => $group_name,
+        purge_configs => false,
       }
       # fix /etc/httpd/run symlink to be consistent with /etc/init.d/httpd pidfile location
       file { "${::apache::httpd_dir}/run":
