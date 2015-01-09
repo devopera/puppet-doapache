@@ -131,7 +131,13 @@ class doapache (
           },
         }
       }
-      # use puppet module to install apache (uses yum, therefore devopera repo)
+      # ensure the conf.d directory is there
+      file { "${::apache::params::confd_dir}":
+        ensure  => directory,
+        notify  => Service["${::apache::params::service_name}"],
+        require => Package["${::apache::params::apache_name}"],
+      }
+      # could use puppet module to install apache (uses yum, therefore devopera repo)
       # no longer using apache module
       #   class { 'apache':
       #     group => $group_name,
