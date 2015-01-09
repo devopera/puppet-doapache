@@ -32,8 +32,9 @@ class doapache (
   # but don't monitor because we typically do that 1 layer up for web services
   $monitor = false,
 
-  # port only used for monitoring
+  # port only used for monitor/firewall
   $port = 80,
+  $port_https = undef,
 
   # end of class arguments
   # ----------------------

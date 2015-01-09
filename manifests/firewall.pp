@@ -4,8 +4,8 @@ class doapache::firewall (
   # ---------------
   # setup defaults
 
-  $port = 80,
-  $port_https = 443,
+  $port = undef,
+  $port_https = undef,
 
   # end of class arguments
   # ----------------------
@@ -13,14 +13,14 @@ class doapache::firewall (
 
 ) {
 
-  if ($port) {
+  if ($port != undef) {
     @docommon::fireport { "000${port} HTTP web service":
       protocol => 'tcp',
       port     => $port,
     }
   }
   
-  if ($port_https) {
+  if ($port_https != undef) {
     @docommon::fireport { "00${port_https} HTTPS web service":
       protocol => 'tcp',
       port     => $port_https,
