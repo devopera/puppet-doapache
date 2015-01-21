@@ -160,12 +160,16 @@ class doapache (
   # open up firewall ports and monitor
   if ($firewall) {
     class { 'doapache::firewall' :
-      port => $port, 
+      port => $port,
     }
   }
   if ($monitor) {
-    class { 'doapache::monitor' : 
-      port => $port, 
+    # trying in class because defaults don't apply to nested classes
+    #class { 'doapache::monitor' : 
+    #  port => $port,
+    #}
+    @nagios::service { "http:${port}-doapache-${::fqdn}":
+      check_command => "http_port!${port}",
     }
   }
 
