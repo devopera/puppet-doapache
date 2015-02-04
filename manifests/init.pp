@@ -214,6 +214,11 @@ class doapache (
     }
   }
 
+  # flag apache as one of the sensitve services
+  Service <| title == "${::apache::params::service_name}" |> {
+    tag => 'service-sensitive',
+  }
+
   # setup hostname in conf.d
   file { 'doapache-conf-hostname' :
     name => "/etc/${apache::params::apache_name}/${doapache::params::confd_name}/hostname.conf",
