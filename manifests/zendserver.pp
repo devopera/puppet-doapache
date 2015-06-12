@@ -239,6 +239,9 @@ class doapache::zendserver (
           file { 'doapache-zend-repo-file':
             name => '/etc/apt/sources.list.d/zend.list',
             # using special ubuntu.repo file, but eventually default back to deb.repo
+            owner => 'root',
+            group => 'root',
+            mode => 0644,
             source => 'puppet:///modules/doapache/zend.ubuntu-apache2.4.repo',
           }
         }
@@ -246,6 +249,9 @@ class doapache::zendserver (
           file { 'doapache-zend-repo-file':
             name => '/etc/apt/sources.list.d/zend.list',
             # using special ubuntu.repo file, but eventually default back to deb.repo
+            owner => 'root',
+            group => 'root',
+            mode => 0644,
             source => 'puppet:///modules/doapache/zend.ubuntu.repo',
           }
         }
