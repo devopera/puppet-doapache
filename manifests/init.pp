@@ -32,9 +32,11 @@ class doapache (
   # but don't monitor because we typically do that 1 layer up for web services
   $monitor = false,
 
-  # port only used for monitor/firewall
+  # port used for monitor/firewall/namevirtualhost
   $port = 80,
   $port_https = undef,
+  # addr used by hostname.conf:NameVirtualHost as scope
+  $addr = '*',
 
   # end of class arguments
   # ----------------------
@@ -222,7 +224,7 @@ class doapache (
   # setup hostname in conf.d
   file { 'doapache-conf-hostname' :
     name => "/etc/${apache::params::apache_name}/${doapache::params::confd_name}/hostname.conf",
-    content => "ServerName ${fqdn}\nNameVirtualHost *:${port}\n",
+    content => "ServerName ${fqdn}\nNameVirtualHost ${addr}:${port}\n",
     require => Anchor['doapache-package'],
     before => Anchor['doapache-pre-start'],
   }
