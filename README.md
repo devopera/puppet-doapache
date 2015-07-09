@@ -6,6 +6,10 @@ Apache setup for devopera puppet config.  This module incorporates and replaces 
 Changelog
 ---------
 
+2015-07-09
+
+  * Added $addr to allow for narrower scope on vhosts
+
 2014-12-19
 
   * Added Ubuntu 14.04 LTS support for Zend Server 6.3 and Apache 2.4
