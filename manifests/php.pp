@@ -13,7 +13,7 @@ class doapache::php (
   $php_version = '5.3',
   
   # php.ini setting defaults
-  $php_path = '/usr/local/zend/etc/php.ini',
+  $php_path = $doapache::params::php_path,
   $php_timezone = 'Europe/London',
   $php_memory_limit = '128M',
   $php_post_max_size = '10M',
@@ -29,15 +29,29 @@ class doapache::php (
   # ----------------------
   # begin class
 
-) {
+) inherits doapache::params {
 
   case $server_provider {
     'zend': {
       # zendserver comes bundled with php
+
+      # setup php command line (symlink to php in zend server)
+      file { 'php-command-line':
+        name => '/usr/bin/php',
+        ensure => 'link',
+        target => '/usr/local/zend/bin/php',
+        require => Anchor['doapache-package'],
+      }
+
     }
     'apache': {
       # strip period from php version to get lib name
       $php_version_safe = regsubst($php_version, '\.', '')
+
+      package { 'php' : }
+      package { 'php-mysql' : }
+      package { 'php-cli' : }
+      package { 'php-common' : }
 
       # non-zend PHP isn't really supported yet
       #
@@ -72,14 +86,6 @@ class doapache::php (
     ],
     require => Anchor['doapache-package'],
     before => Anchor['doapache-pre-start'],
-  }
-
-  # setup php command line (symlink to php in zend server)
-  file { 'php-command-line':
-    name => '/usr/bin/php',
-    ensure => 'link',
-    target => '/usr/local/zend/bin/php',
-    require => Anchor['doapache-package'],
   }
 
   # install PEAR to 1.9.2+ so it can use pear.drush.org without complaint

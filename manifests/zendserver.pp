@@ -34,13 +34,6 @@ class doapache::zendserver (
     tag => ['doapache-zend-package'],
   }
 
-  # give apache a custom group
-  class {'doapache::zendserver::group':
-    user => $user,
-    group_name => $group_name,
-    notifier_dir => $notifier_dir,
-  }
-
   # create a common anchor for external packages
   anchor { 'doapache-package' :
     require => Package['doapache-zend-web-pack'],

@@ -15,7 +15,7 @@ class doapache (
   $php_version = '5.3',
   
   # php.ini setting defaults
-  $php_path = '/usr/local/zend/etc/php.ini',
+  $php_path = $doapache::params::php_path,
   $php_timezone = 'Europe/London',
   $php_memory_limit = '128M',
   $php_post_max_size = '10M',
@@ -59,22 +59,6 @@ class doapache (
       }
       # append zend user to groups
       $webserver_user_group_append = ',zend'
-      # configure php for zendserver
-      class {'doapache::php':
-        user => $user,
-        server_provider => $server_provider,
-        server_version => $server_version,
-        php_version => $php_version,
-        php_path => $php_path,
-        php_timezone => $php_timezone,
-        php_memory_limit => $php_memory_limit,
-        php_post_max_size => $php_post_max_size,
-        php_upload_max_filesize => $php_upload_max_filesize,
-        php_internal_encoding => $php_internal_encoding,
-        php_session_gc_maxlifetime => $php_session_gc_maxlifetime,
-        php_max_input_vars => $php_max_input_vars,
-        notifier_dir => $notifier_dir,
-      }
     }
     'apache': {
       # no need to append user because apache already in group add list
@@ -139,12 +123,6 @@ class doapache (
         notify  => Service["${::apache::params::service_name}"],
         require => Package["${::apache::params::apache_name}"],
       }
-      # could use puppet module to install apache (uses yum, therefore devopera repo)
-      # no longer using apache module
-      #   class { 'apache':
-      #     group => $group_name,
-      #   }
-      # in favour of just doing it ourselves
       service { "${::apache::params::service_name}" :
         enable => true,
         ensure => running,
@@ -152,6 +130,30 @@ class doapache (
         hasrestart => true,
       }
     }
+  }
+
+  # configure php for zendserver
+  class {'doapache::php':
+    user => $user,
+    server_provider => $server_provider,
+    server_version => $server_version,
+    php_version => $php_version,
+    php_path => $php_path,
+    php_timezone => $php_timezone,
+    php_memory_limit => $php_memory_limit,
+    php_post_max_size => $php_post_max_size,
+    php_upload_max_filesize => $php_upload_max_filesize,
+    php_internal_encoding => $php_internal_encoding,
+    php_session_gc_maxlifetime => $php_session_gc_maxlifetime,
+    php_max_input_vars => $php_max_input_vars,
+    notifier_dir => $notifier_dir,
+  }
+
+  # give apache a custom group
+  class {'doapache::group':
+    user => $user,
+    group_name => $group_name,
+    notifier_dir => $notifier_dir,
   }
 
   #

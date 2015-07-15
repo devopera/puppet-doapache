@@ -1,4 +1,4 @@
-class doapache::zendserver::group (
+class doapache::group (
 
   # class arguments
   # ---------------

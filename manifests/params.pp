@@ -16,5 +16,14 @@ class doapache::params {
     }
   }
 
+  case $server_provider {
+    'zend': {
+      $php_path = '/usr/local/zend/etc/php.ini'
+    }
+    'apache': {
+      $php_path = '/etc/php.ini'
+    }
+  }
+
 }
 
