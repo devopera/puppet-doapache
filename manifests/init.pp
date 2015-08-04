@@ -209,6 +209,12 @@ class doapache (
         command => 'a2dissite 000-default',
         require => Anchor['doapache-package'],
       }
+      # enable mod_ssl by default
+      exec { 'doapache-ubuntu-enable-modssl' :
+        path => '/bin:/usr/bin:/sbin:/usr/sbin',
+        command => 'a2enmod ssl',
+        require => Anchor['doapache-package'],
+      }
       # ensure that there's an apache user (otherwise tries to run with www-data:www-data)
       docommon::ensureuser { 'doapache-apache-create-user' :
         user => 'apache',
