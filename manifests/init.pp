@@ -232,7 +232,7 @@ class doapache (
   # setup hostname in conf.d, with options for multiple HTTP and HTTPS virtualhosts
   file { 'doapache-conf-hostname' :
     name => "/etc/${apache::params::apache_name}/${doapache::params::confd_name}/hostname.conf",
-    content => "ServerName ${fqdn}\nNameVirtualHost ${addr}:${port}\nNameVirtualHost ${addr}:443}\n",
+    content => "ServerName ${fqdn}\nNameVirtualHost ${addr}:${port}\nNameVirtualHost ${addr}:443\n",
     require => Anchor['doapache-package'],
     before => Anchor['doapache-pre-start'],
   }
