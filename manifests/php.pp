@@ -93,4 +93,10 @@ class doapache::php (
     require => Anchor['doapache-package'],
   }
 
+  # install PHPUnit
+  exec { 'doapache-php-phpunit':
+    path => '/bin:/usr/bin:/sbin:/usr/sbin',
+    command => 'wget https://phar.phpunit.de/phpunit.phar -O /usr/local/bin/phpunit && chmod +x /usr/local/bin/phpunit',
+  }
+
 }

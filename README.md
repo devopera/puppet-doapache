@@ -6,6 +6,10 @@ Apache setup for devopera puppet config.  This module incorporates and replaces 
 Changelog
 ---------
 
+2015-09-18
+
+  * Added PHPUnit by default
+
 2015-07-09
 
   * Added $addr to allow for narrower scope on vhosts
