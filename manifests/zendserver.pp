@@ -9,11 +9,10 @@ class doapache::zendserver (
   $with_memcache = false,
 
   # by default work off the Zend Server (default) repo, options '6.0, 6.1, 6.2, 6.3'
-  $server_provider = 'zend',
-  $server_version = undef,
-  # by default, install php 5.3, option '5.4, 5.5'
-  $php_version = '5.3',
-  
+  $server_provider = $doapache::params::server_provider,
+  $server_version = $doapache::params::server_version,
+  $php_version = $doapache::params::php_version,
+ 
   # notifier dir for avoid repeat-runs
   $notifier_dir = '/etc/puppet/tmp',
 
@@ -96,15 +95,16 @@ class doapache::zendserver (
     require => File['zend-libpath-forall'],
   }
 
+  # setup the zend repo file
+  class { 'doapache::zendserver::repo':
+    server_version => $server_version,
+  }
+
   #
   # OS-specific bits
   # 
   case $operatingsystem {
     centos, redhat, fedora: {
-      # setup the zend repo file
-      class { 'doapache::zendserver::repo': 
-        server_version => $server_version,
-      }
       # install SSH2
       package { 'doapache-zend-install-ssh2-module':
         name => "php-${php_version}-ssh2-zend-server",
@@ -203,7 +203,7 @@ class doapache::zendserver (
               before => [Anchor['doapache-pre-start']],
             }
           }
-          6.0, 6.1, 6.2, 6.3, default: {
+          6.0, 6.1, 6.2, 6.3, 7.0, default: {
             # no selinux cleanup specific to this version
             Exec <| title == 'zend-selinux-fix-libs' |> {
               noop => true,
@@ -220,47 +220,6 @@ class doapache::zendserver (
     }
 
     ubuntu, debian: {
-      # install key
-      exec { 'zend-repo-key' :
-        path => '/usr/bin:/bin',
-        command => 'wget http://repos.zend.com/zend.key -O- | sudo apt-key add -',
-        cwd => '/tmp/',
-      }
-      # setup repo
-      case $operatingsystemmajrelease {
-        '13.04', '14.04': {
-          file { 'doapache-zend-repo-file':
-            name => '/etc/apt/sources.list.d/zend.list',
-            # using special ubuntu.repo file, but eventually default back to deb.repo
-            owner => 'root',
-            group => 'root',
-            mode => 0644,
-            source => 'puppet:///modules/doapache/zend.ubuntu-apache2.4.repo',
-          }
-        }
-        '12.04', default: {
-          file { 'doapache-zend-repo-file':
-            name => '/etc/apt/sources.list.d/zend.list',
-            # using special ubuntu.repo file, but eventually default back to deb.repo
-            owner => 'root',
-            group => 'root',
-            mode => 0644,
-            source => 'puppet:///modules/doapache/zend.ubuntu.repo',
-          }
-        }
-      }
-      # re-flash the repos
-      exec { 'zend-repo-reflash':
-        path => '/usr/bin:/bin',
-        command => 'sudo apt-get update',
-        require => [Exec['zend-repo-key'], File['doapache-zend-repo-file']],
-      }
-      # make the package install dependent upon the reflash
-      Package <| tag == 'doapache-zend-package' |> {
-        require => Exec['zend-repo-reflash'],
-      }
-      # @todo find pecl-ssh2 package for ubuntu
-      # @todo find mod_ssl package for ubuntu
     }
   }
 }

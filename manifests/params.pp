@@ -5,7 +5,7 @@ class doapache::params {
       $confd_name = 'conf.d'
     }
     ubuntu, debian: {
-      case $operatingsystemmajrelease {
+      case $::operatingsystemmajrelease {
         '13.04', '14.04': {
           $confd_name = 'conf-enabled'
         }
@@ -22,6 +22,35 @@ class doapache::params {
     }
     'apache': {
       $php_path = '/etc/php.ini'
+    }
+  }
+
+  # setup php and zendserver versions
+  $server_provider = 'zend'
+  case $::operatingsystem {
+    centos, redhat: {
+      case $::operatingsystemmajrelease {
+        '7': {
+          $server_version = '8.5.4'
+          $php_version = '5.6'
+        }
+        '6', default: {
+          $server_version = '6.3'
+          $php_version = '5.3'
+        }
+      }
+    }
+    ubuntu, debian: {
+      case $::operatingsystemmajrelease {
+        '13.04', '14.04': {
+          $server_version = '8.5.4'
+          $php_version = '5.6'
+        }
+        '12.04', default: {
+          $server_version = '6.3'
+          $php_version = '5.3'
+        }
+      }
     }
   }
 
