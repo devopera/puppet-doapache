@@ -16,14 +16,6 @@ class doapache::params {
     }
   }
 
-  case $server_provider {
-    'zend': {
-      $php_path = '/usr/local/zend/etc/php.ini'
-    }
-    'apache': {
-      $php_path = '/etc/php.ini'
-    }
-  }
 
   # setup php and zendserver versions
   $server_provider = 'zend'
@@ -51,6 +43,15 @@ class doapache::params {
           $php_version = '5.3'
         }
       }
+    }
+  }
+
+  case $server_provider {
+    'zend', default: {
+      $php_path = '/usr/local/zend/etc/php.ini'
+    }
+    'apache': {
+      $php_path = '/etc/php.ini'
     }
   }
 
