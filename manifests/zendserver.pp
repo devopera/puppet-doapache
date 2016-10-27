@@ -170,7 +170,7 @@ class doapache::zendserver (
         # make log dir fix permanent to withstand a relabelling
         exec { 'zend-selinux-log-permfix' :
           path => '/usr/bin:/bin:/usr/sbin',
-          command => "semanage fcontext -a -t httpd_log_t '/usr/local/zend/var/log(/.*)?' && touch ${notifier_dir}/puppet-doapache-selinux-fix",
+          command => "semanage fcontext -a -t httpd_log_t '/usr/local/zend/var/log(/.*)?' && restorecon -R /usr/local/zend/var/log && touch ${notifier_dir}/puppet-doapache-selinux-fix",
           creates => "${notifier_dir}/puppet-doapache-selinux-fix",
           before => Anchor['doapache-pre-start'],
           require => File["${notifier_dir}"],
