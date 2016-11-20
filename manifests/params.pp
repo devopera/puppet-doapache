@@ -6,10 +6,10 @@ class doapache::params {
     }
     ubuntu, debian: {
       case $::operatingsystemmajrelease {
-        '13.04', '14.04': {
+        '13.04', '14.04', default: {
           $confd_name = 'conf-enabled'
         }
-        '12.04', default: {
+        '12.04': {
           $confd_name = 'conf.d'
         }
       }
@@ -22,11 +22,11 @@ class doapache::params {
   case $::operatingsystem {
     centos, redhat: {
       case $::operatingsystemmajrelease {
-        '7': {
+        '7', default: {
           $server_version = '8.5.4'
           $php_version = '5.6'
         }
-        '6', default: {
+        '6': {
           $server_version = '6.3'
           $php_version = '5.3'
         }
@@ -34,11 +34,11 @@ class doapache::params {
     }
     ubuntu, debian: {
       case $::operatingsystemmajrelease {
-        '13.04', '14.04': {
+        '13.04', '14.04', default: {
           $server_version = '8.5.4'
           $php_version = '5.6'
         }
-        '12.04', default: {
+        '12.04': {
           $server_version = '6.3'
           $php_version = '5.3'
         }
