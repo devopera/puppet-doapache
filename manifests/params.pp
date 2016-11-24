@@ -23,7 +23,7 @@ class doapache::params {
     centos, redhat: {
       case $::operatingsystemmajrelease {
         '7', default: {
-          $server_version = '8.5.4'
+          $server_version = '8.5'
           $php_version = '5.6'
         }
         '6': {
@@ -35,7 +35,7 @@ class doapache::params {
     ubuntu, debian: {
       case $::operatingsystemmajrelease {
         '13.04', '14.04', default: {
-          $server_version = '8.5.4'
+          $server_version = '8.5'
           $php_version = '5.6'
         }
         '12.04': {
