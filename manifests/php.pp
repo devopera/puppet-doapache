@@ -93,9 +93,10 @@ class doapache::php (
   }
 
   # install PHPUnit
-  exec { 'doapache-php-phpunit':
-    path => '/bin:/usr/bin:/sbin:/usr/sbin',
-    command => 'wget https://phar.phpunit.de/phpunit.phar -O /usr/local/bin/phpunit && chmod +x /usr/local/bin/phpunit',
-  }
+  # phar install works but always gets latest version (which requires PHP 7)
+  #exec { 'doapache-php-phpunit':
+  #  path => '/bin:/usr/bin:/sbin:/usr/sbin',
+  #  command => 'wget https://phar.phpunit.de/phpunit.phar -O /usr/local/bin/phpunit && chmod +x /usr/local/bin/phpunit',
+  #}
 
 }
