@@ -25,7 +25,7 @@ class doapache::group (
       $apache_member_list = "${user},apache${webserver_user_group_append}"
     }
     ubuntu, debian: {
-      # not the www-data string here is used because we're substituting what ubuntu inserts with our var $group_name
+      # the www-data string is used here because we're substituting what ubuntu inserts with our var $group_name
       $apache_conf_command = "sed -i -e 's/APACHE_RUN_GROUP=www-data/APACHE_RUN_GROUP=${group_name}/' ${signatureSed} /etc/${apache::params::apache_name}/envvars"
       $apache_conf_if = "grep -c 'APACHE_RUN_GROUP=www-data' /etc/${apache::params::apache_name}/envvars"
       # ubuntu doesn't have an apache user, only www-data
@@ -43,7 +43,7 @@ class doapache::group (
     command => "groupadd -f ${group_name} -g 5000 && gpasswd -M ${apache_member_list} ${group_name}",
     before => Anchor['doapache-pre-start'],
   }->
-  # apply www-data group to web root folder
+  # apply www-data group to web root folder (less crucial now)
   exec { 'doapache-group-apply-to-web' :
     path => '/bin:/sbin:/usr/bin:/usr/sbin',
     command => "chgrp ${group_name} -R /var/www",
