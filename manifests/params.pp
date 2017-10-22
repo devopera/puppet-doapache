@@ -1,5 +1,7 @@
 class doapache::params {
 
+  $timezone = 'Etc/UTC'
+
   case $operatingsystem {
     centos, redhat, fedora: {
       $confd_name = 'conf.d'

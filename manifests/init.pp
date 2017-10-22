@@ -15,7 +15,7 @@ class doapache (
   
   # php.ini setting defaults
   $php_path = $doapache::params::php_path,
-  $php_timezone = 'Europe/London',
+  $php_timezone = $doapache::params::timezone,
   $php_memory_limit = '128M',
   $php_post_max_size = '10M',
   $php_upload_max_filesize = '10M',
