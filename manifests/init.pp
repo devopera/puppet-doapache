@@ -236,4 +236,10 @@ class doapache (
     before => Anchor['doapache-pre-start'],
   }
 
+  # create simple index.html to avoid giving away sensitive details (OS/Apache)
+  file { 'doapache-var-www-html-index' :
+    name => '/var/www/html/index.html',
+    content => "Inactive (Server IP: ${::ipaddress})",
+    require => Anchor['doapache-package'],
+  }
 }
