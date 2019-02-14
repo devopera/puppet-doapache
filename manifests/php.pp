@@ -8,7 +8,6 @@ class doapache::php (
 
   # by default work off the Zend Server (default) repo, options '6.0, 6.1, 6.2, 6.3'
   $server_provider = $doapache::params::server_provider,
-  $server_version = $doapache::params::server_version,
   $php_version = $doapache::params::php_version,
   
   # php.ini setting defaults

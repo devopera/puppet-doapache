@@ -8,9 +8,8 @@ class doapache::zendserver (
   $group_name = 'www-data',
   $with_memcache = false,
 
-  # by default work off the Zend Server (default) repo, options '6.0, 6.1, 6.2, 6.3'
   $server_provider = $doapache::params::server_provider,
-  $server_version = $doapache::params::server_version,
+  $server_version = $doapache::params::zend_server_version,
   $php_version = $doapache::params::php_version,
  
   # notifier dir for avoid repeat-runs

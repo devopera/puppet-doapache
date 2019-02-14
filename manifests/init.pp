@@ -10,11 +10,13 @@ class doapache (
 
   # by default work off the Zend Server (default) repo, options '6.0, 6.1, 6.2, 6.3'
   $server_provider = $doapache::params::server_provider,
-  $server_version = $doapache::params::server_version,
+  $zend_server_version = $doapache::params::zend_server_version,
+  $apache_server_version = $doapache::params::apache_server_version,
   $php_version = $doapache::params::php_version,
   
   # php.ini setting defaults
-  $php_path = $doapache::params::php_path,
+  $apache_php_path = $doapache::params::apache_php_path,
+  $zend_php_path = $doapache::params::zend_php_path,
   $php_timezone = $doapache::params::timezone,
   $php_memory_limit = '128M',
   $php_post_max_size = '10M',
@@ -52,7 +54,7 @@ class doapache (
         group_name => $group_name,
         with_memcache => $with_memcache,
         server_provider => $server_provider,
-        server_version => $server_version,
+        server_version => $zend_server_version,
         php_version => $php_version,
         notifier_dir => $notifier_dir,
       }
@@ -76,7 +78,7 @@ class doapache (
       anchor { 'doapache-pre-start' :
         before => Service["${::apache::params::service_name}"],
       }
-      case $server_version {
+      case $apache_server_version {
         '2.2.29-1': {
           # install devopera yum repo, not enabled by default
           yumrepo { 'devopera':
@@ -98,21 +100,23 @@ class doapache (
             before => [Package["${::apache::params::apache_name}"]],
           }
         }
+        default, 'present': {
+        }
       }
       # install required apache packages (to version if specified)
       if ! defined(Package["${::apache::params::apache_name}"]) {
         package { "${::apache::params::apache_name}" :
-          ensure => $server_version ? {
+          ensure => $apache_server_version ? {
             undef   => 'present',
-            default => $server_version,
+            default => $apache_server_version,
           },
         }
       }
       if ! defined(Package['mod_ssl']) {
         package { 'mod_ssl' :
-          ensure => $server_version ? {
+          ensure => $apache_server_version ? {
             undef   => 'present',
-            default => $server_version,
+            default => $apache_server_version,
           },
         }
       }
@@ -135,9 +139,11 @@ class doapache (
   class {'doapache::php':
     user => $user,
     server_provider => $server_provider,
-    server_version => $server_version,
     php_version => $php_version,
-    php_path => $php_path,
+    php_path => $server_provider ? {
+      'zend' => $zend_php_path,
+      'apache' => $apache_php_path,
+    },
     php_timezone => $php_timezone,
     php_memory_limit => $php_memory_limit,
     php_post_max_size => $php_post_max_size,

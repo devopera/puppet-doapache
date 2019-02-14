@@ -18,6 +18,7 @@ class doapache::params {
     }
   }
 
+  $apache_server_version = 'present'
 
   # setup php and zendserver versions
   $server_provider = 'zend'
@@ -25,11 +26,11 @@ class doapache::params {
     centos, redhat: {
       case $::operatingsystemmajrelease {
         '7', default: {
-          $server_version = '8.5'
+          $zend_server_version = '8.5'
           $php_version = '5.6'
         }
         '6': {
-          $server_version = '6.3'
+          $zend_server_version = '6.3'
           $php_version = '5.3'
         }
       }
@@ -37,25 +38,19 @@ class doapache::params {
     ubuntu, debian: {
       case $::operatingsystemmajrelease {
         '13.04', '14.04', default: {
-          $server_version = '8.5'
+          $zend_server_version = '8.5'
           $php_version = '5.6'
         }
         '12.04': {
-          $server_version = '6.3'
+          $zend_server_version = '6.3'
           $php_version = '5.3'
         }
       }
     }
   }
 
-  case $server_provider {
-    'zend', default: {
-      $php_path = '/usr/local/zend/etc/php.ini'
-    }
-    'apache': {
-      $php_path = '/etc/php.ini'
-    }
-  }
+  $zend_php_path = '/usr/local/zend/etc/php.ini'
+  $apache_php_path = '/etc/php.ini'
 
 }
 
